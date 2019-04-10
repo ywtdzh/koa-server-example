@@ -1,0 +1,19 @@
+{
+  "dependencies": {
+    "axios": "^0.18.0",
+    "koa": "^2.7.0",
+    "koa-bodyparser": "^4.2.1",
+    "koa-convert": "^1.2.0",
+    "koa-cors": "^0.0.16",
+    "koa-router": "^7.4.0",
+    "koa-static": "^5.0.0",
+    "pg": "^7.8.1",
+    "redis": "^2.8.0",
+    "sequelize": "^4.43.0",
+    "uuid": "^3.3.2"
+  },
+  "scripts": {
+    "start": "node bin/server.js",
+    "init": "node bin/init.js"
+  }
+}

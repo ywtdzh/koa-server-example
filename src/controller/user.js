@@ -1,0 +1,59 @@
+const pendingModels = require('../models');
+const config = require('../../config');
+const {Op} = require('sequelize');
+const {redisClient, secretHash} = require('../utils');
+const uniqueUUID = require('uuid/v1');
+const randomUUID = require('uuid/v4');
+
+async function getUserByToken(token, identifier) {
+  const {user: User} = await pendingModels;
+  const id = parseInt(await redisClient.hashGet(token, identifier));
+  if (Number.isNaN(id)) return null;
+  return await User.findByPk(id);
+}
+
+async function createUser(options = {username: '', password: '', description: ''}) {
+  const {user: User} = await pendingModels;
+  const salt = typeof config.database.salt === 'function' ?
+    await config.database.salt(options.username) :
+    config.database.salt.toString();
+  const encrypted = await secretHash(options.password.mix(salt), salt);
+  const [theUser, created] = await User.findOrCreate({
+    where: {username: options.username},
+    defaults: Object.assign(options, {password: encrypted}),
+  });
+  return created ? theUser : null;
+}
+
+async function validateUser(username, password) {
+  const {user: User} = await pendingModels;
+  const theUser = await User.findOne({where: {username}});
+  if (!theUser) return {status: false};
+  const salt = typeof config.database.salt === 'function' ?
+    await config.database.salt(username) :
+    config.database.salt.toString();
+  return {status: await secretHash(password.mix(salt), salt) === theUser.getDataValue('password'), theUser};
+}
+
+async function dropUser({username, id}) {
+  const {user: User} = await pendingModels;
+  const theUser = await User.findOne({where: {[Op.or]: [{username}, {id}]}});
+  if (!theUser) return false;
+  await theUser.destroy();
+  return true;
+}
+
+async function login(username, password, deviceIdentifier) {
+  const {status: success, theUser} = await validateUser(username, password);
+  if (!success) return false;
+  const token = `${uniqueUUID()}`.mix(randomUUID());
+  await redisClient.hashSet(token, deviceIdentifier, theUser.getDataValue('id'));
+  return token;
+}
+
+async function logout(token, deviceIdentifier) {
+  if (!deviceIdentifier) return await redisClient.expire(token);
+  return await redisClient.hashSet(token, deviceIdentifier, 'null');
+}
+
+module.exports = {name: 'user', getUserByToken, createUser, validateUser, dropUser, login, logout};
