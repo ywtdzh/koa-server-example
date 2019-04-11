@@ -1,5 +1,5 @@
 const pendingModels = require('../src/models'),
-  pendingControllers = require('../src/controllers');
+  pendingControllers = require('../src/controller');
 
 Promise.all([pendingControllers, pendingModels])
   .then(([controller, model]) => {
