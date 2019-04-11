@@ -1,12 +1,15 @@
-const pendingModel = require('../src/models');
+const pendingModels = require('../src/models'),
+  pendingControllers = require('../src/controllers');
 
-pendingModel.then(model => {
-  model.database.sync({force: (process.argv[2] || '').includes('-f')})
-    .then(() => {
-      return model.user.findOrCreate({
-        where: {username: 'root'},
-        defaults: {password: 'default', description: 'Administrator of the application'},
-      });
-    })
-    .then(() => process.exit(0));
-});
+Promise.all([pendingControllers, pendingModels])
+  .then(([controller, model]) => {
+    return model.database.sync({force: (process.argv[2] || '').includes('-f')})
+      .then(() => {
+        return controller.user.createUser({
+          username: 'root',
+          password: 'default',
+          description: 'Administrator of the application',
+        });
+      })
+      .then(() => process.exit(0));
+  });
