@@ -11,11 +11,11 @@ module.exports = function route(router) {
 
   post('login', async ctx => {
     const {username, password, identifier} = ctx.request.body;
-    if (!username || !password) return reply(ctx, new Error('Username & password required'), null, 1);
+    if (!username || !password) return reply(ctx, null, new Error('Username & password required'), 1);
     const {user: User} = await pendingControllers;
     const token = await User.login(username, password, identifier || '0');
-    if (!token) reply(ctx, new Error('Authentication failed'), null, 100);
-    else reply(ctx, null, {token});
+    if (!token) reply(ctx, null, new Error('Authentication failed'), 100);
+    else reply(ctx, {token}, null);
   });
 
   get('logout', async ctx => {
@@ -29,13 +29,13 @@ module.exports = function route(router) {
 
   post('register', async ctx => {
     const {username, password, identifier, description} = ctx.request.body;
-    if (!username || !password) return reply(ctx, new Error('Username & password required'), null, 1);
+    if (!username || !password) return reply(ctx, null, new Error('Username & password required'), 1);
     const {user: User} = await pendingControllers;
     const user = await User.createUser({username, password, description});
-    if (user === null) return reply(ctx, new Error('Username exist'), null, 101);
+    if (user === null) return reply(ctx, null, new Error('Username exist'), 101);
     const token = await User.login(username, password, identifier);
-    if (!token) reply(ctx, new Error('Authentication failed'), null, 100);
-    else reply(ctx, null, {token});
+    if (!token) reply(ctx, null, new Error('Authentication failed'), 100);
+    else reply(ctx, {token}, null);
   });
 
   get('hello', async ctx => {
@@ -43,8 +43,8 @@ module.exports = function route(router) {
     if (token) {
       const {user: User} = await pendingControllers;
       const theUser = await User.getUserByToken(token, identifier || '0');
-      if (theUser) return reply(ctx, null, {message: 'success'});
+      if (theUser) return reply(ctx, {message: 'success'}, null);
     }
-    reply(ctx, new Error('Login status check failed'), null, 102);
+    reply(ctx, null, new Error('Login status check failed'), 102);
   });
 };
