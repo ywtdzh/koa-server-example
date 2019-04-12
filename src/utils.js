@@ -59,7 +59,7 @@ const redisClient = {
   expire: promisify(client.expire).bind(client),
 };
 
-function reply(ctx, data, error, status = 0) {
+function reply(ctx, data, error = null, status = 0) {
   ctx.body = {
     status, error: error ? error.toString() : null, data: error ? {
       message: error.message,

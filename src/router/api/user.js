@@ -15,7 +15,7 @@ module.exports = function route(router) {
     const {user: User} = await pendingControllers;
     const token = await User.login(username, password, identifier || '0');
     if (!token) reply(ctx, null, new Error('Authentication failed'), 100);
-    else reply(ctx, {token}, null);
+    else reply(ctx, {token});
   });
 
   get('logout', async ctx => {
@@ -24,7 +24,7 @@ module.exports = function route(router) {
       const {user: User} = await pendingControllers;
       await User.logout(token, identifier);
     }
-    reply(ctx, null, null);
+    reply(ctx, null);
   });
 
   post('register', async ctx => {
@@ -35,7 +35,7 @@ module.exports = function route(router) {
     if (user === null) return reply(ctx, null, new Error('Username exist'), 101);
     const token = await User.login(username, password, identifier);
     if (!token) reply(ctx, null, new Error('Authentication failed'), 100);
-    else reply(ctx, {token}, null);
+    else reply(ctx, {token});
   });
 
   get('hello', async ctx => {
@@ -43,7 +43,7 @@ module.exports = function route(router) {
     if (token) {
       const {user: User} = await pendingControllers;
       const theUser = await User.getUserByToken(token, identifier || '0');
-      if (theUser) return reply(ctx, {message: 'success'}, null);
+      if (theUser) return reply(ctx, {message: 'success'});
     }
     reply(ctx, null, new Error('Login status check failed'), 102);
   });
