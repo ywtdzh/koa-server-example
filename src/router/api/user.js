@@ -18,7 +18,7 @@ module.exports = function route(router) {
     else reply(ctx, {token});
   });
 
-  get('logout', async ctx => {
+  post('logout', async ctx => {
     const {token, identifier} = ctx.request.header;
     if (token) {
       const {user: User} = await pendingControllers;

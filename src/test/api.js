@@ -29,7 +29,7 @@ describe('Api test', function () {
         headers: {token, identifier: identifier + 'a'},
       })).data;
       assert.strictEqual(loginResponse.status, 102);
-      await axios.get(user('logout'), {
+      await axios.post(user('logout'), {}, {
         headers: {token, identifier},
       });
       loginResponse = (await axios.get(user('hello'), {

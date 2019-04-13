@@ -28,7 +28,7 @@ data = {
 | 100         | Authentication Failed, wrong username or password |
 | 101         | Username has been existed                         |
 
-- /api/user/login
+- POST /api/user/login
   ```js
   requestBody = {
     username: String,
@@ -42,7 +42,7 @@ data = {
   }
   ```
 
-- /api/user/logout
+- POST /api/user/logout
   ```js
   requestBody = {
     deviceIdentifier: String,
@@ -58,7 +58,7 @@ data = {
   data = null
   ```
 
-- /api/user/register
+- POST /api/user/register
 
   ```js
   requestBody = {
