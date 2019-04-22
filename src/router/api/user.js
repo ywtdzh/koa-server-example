@@ -38,6 +38,20 @@ module.exports = function route(router) {
     else reply(ctx, {token});
   });
 
+  post('change_password', async ctx => {
+    const {username, previous, expected} = ctx.request.body;
+    const {user: User} = await pendingControllers;
+    const user = await User.getUser({username});
+    if (!user) return reply(ctx, null, Error('Wrong username or password'), 100);
+    if (user.password === await User.hashPassword(username, previous)) {
+      user.password = await User.hashPassword(username, expected);
+      await user.save();
+      reply(ctx);
+    } else {
+      reply(ctx, null, Error('Wrong username or password'), 100);
+    }
+  });
+
   get('hello', async ctx => {
     const {token, identifier} = ctx.request.header;
     if (token) {
@@ -45,6 +59,6 @@ module.exports = function route(router) {
       const theUser = await User.getUserByToken(token, identifier || '0');
       if (theUser) return reply(ctx, {message: 'success'});
     }
-    reply(ctx, null, new Error('Login status check failed'), 102);
+    reply(ctx, null, new Error('Login status check failed'), 2);
   });
 };

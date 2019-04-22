@@ -12,12 +12,16 @@ async function getUserByToken(token, identifier) {
   return await User.findByPk(id);
 }
 
+async function hashPassword(username, password) {
+  const salt = typeof config.database.salt === 'function' ?
+    await config.database.salt(username) :
+    config.database.salt.toString();
+  return await secretHash(password.mix(salt), salt);
+}
+
 async function createUser(options = {username: '', password: '', description: ''}) {
   const {user: User} = await pendingModels;
-  const salt = typeof config.database.salt === 'function' ?
-    await config.database.salt(options.username) :
-    config.database.salt.toString();
-  const encrypted = await secretHash(options.password.mix(salt), salt);
+  const encrypted = await hashPassword(options.username, options.password);
   const [theUser, created] = await User.findOrCreate({
     where: {username: options.username},
     defaults: Object.assign(options, {password: encrypted}),
@@ -29,10 +33,7 @@ async function validateUser(username, password) {
   const {user: User} = await pendingModels;
   const theUser = await User.findOne({where: {username}});
   if (!theUser) return {status: false};
-  const salt = typeof config.database.salt === 'function' ?
-    await config.database.salt(username) :
-    config.database.salt.toString();
-  return {status: await secretHash(password.mix(salt), salt) === theUser.getDataValue('password'), theUser};
+  return {status: await hashPassword(username, password) === theUser.getDataValue('password'), theUser};
 }
 
 async function dropUser({username, id}) {
@@ -56,4 +57,19 @@ async function logout(token, deviceIdentifier) {
   return await redisClient.hashSet(token, deviceIdentifier, 'null');
 }
 
-module.exports = {name: 'user', getUserByToken, createUser, validateUser, dropUser, login, logout};
+async function getUser({username, id}) {
+  const {user: User} = await pendingModels;
+  return await User.findOne({where: {[Op.or]: [{username}, {id}]}});
+}
+
+module.exports = {
+  name: 'user',
+  getUserByToken,
+  createUser,
+  validateUser,
+  dropUser,
+  login,
+  logout,
+  getUser,
+  hashPassword,
+};

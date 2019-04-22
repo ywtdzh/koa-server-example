@@ -85,6 +85,6 @@ function reply(ctx, data, error = null, status = 0) {
 module.exports = {
   autoImport,
   redisClient,
-  secretHash: secretHash,
+  secretHash,
   reply,
 };

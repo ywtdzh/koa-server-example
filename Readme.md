@@ -19,6 +19,7 @@ data = {
 | ----------- | ---------------------------- |
 | 0           | Ok                           |
 | 1           | Necessary parameter required |
+| 2           | Login required               |
 | -1          | Unknown server error         |
 
 ## /api/user/
@@ -74,5 +75,18 @@ data = {
     token: String, // auto login
   }
   ```
+  
+- POST /api/user/change_password
 
+  ```js
+  requestBody = {
+    username: String,
+    previous: String,
+    expected: String, // Hash recommended
+  }
+  ```
+
+  ```js
+  data = null;
+  ```
   
