@@ -36,7 +36,7 @@ async function validateUser(username, password) {
   return {status: await hashPassword(username, password) === theUser.getDataValue('password'), theUser};
 }
 
-async function dropUser({username, id}) {
+async function dropUser({username = null, id = null}) {
   const {user: User} = await pendingModels;
   const theUser = await User.findOne({where: {[Op.or]: [{username}, {id}]}});
   if (!theUser) return false;
@@ -57,7 +57,7 @@ async function logout(token, deviceIdentifier) {
   return await redisClient.hashSet(token, deviceIdentifier, 'null');
 }
 
-async function getUser({username, id}) {
+async function getUser({username = null, id = null}) {
   const {user: User} = await pendingModels;
   return await User.findOne({where: {[Op.or]: [{username}, {id}]}});
 }

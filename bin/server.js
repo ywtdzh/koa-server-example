@@ -15,6 +15,7 @@ app.use(async (context, next) => {
     await next();
   } catch (e) {
     reply(context, null, e, -1);
+    console.error(e.stack);
   }
 });
 app.use(convert(Cors({
