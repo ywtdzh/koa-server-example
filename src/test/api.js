@@ -54,4 +54,11 @@ describe('Api test', function () {
       assert.strictEqual(checkResponse.status, 0);
     });
   });
+  after(async function () {
+    const {user: User} = await pendingControllers;
+    const instances = await Promise.all([
+      User.getUser({id: userId}),
+    ]);
+    await Promise.all(instances.map(instance => instance && instance.destroy()));
+  });
 });

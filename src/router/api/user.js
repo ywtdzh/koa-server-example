@@ -35,7 +35,7 @@ module.exports = function route(router) {
     if (user === null) return reply(ctx, null, new Error('Username exist'), 101);
     const token = await User.login(username, password, identifier);
     if (!token) reply(ctx, null, new Error('Authentication failed'), 100);
-    else reply(ctx, {token});
+    else reply(ctx, {token, userId: user.id});
   });
 
   post('change_password', async ctx => {
