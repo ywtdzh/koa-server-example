@@ -9,7 +9,7 @@
     "koa-static": "^5.0.0",
     "pg": "^7.8.1",
     "redis": "^2.8.0",
-    "sequelize": "^4.43.0",
+    "sequelize": "^5.7.0",
     "uuid": "^3.3.2"
   },
   "scripts": {
