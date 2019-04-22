@@ -36,14 +36,6 @@ async function validateUser(username, password) {
   return {status: await hashPassword(username, password) === theUser.getDataValue('password'), theUser};
 }
 
-async function dropUser({username = null, id = null}) {
-  const {user: User} = await pendingModels;
-  const theUser = await User.findOne({where: {[Op.or]: [{username}, {id}]}});
-  if (!theUser) return false;
-  await theUser.destroy();
-  return true;
-}
-
 async function login(username, password, deviceIdentifier) {
   const {status: success, theUser} = await validateUser(username, password);
   if (!success) return false;
@@ -67,7 +59,6 @@ module.exports = {
   getUserByToken,
   createUser,
   validateUser,
-  dropUser,
   login,
   logout,
   getUser,

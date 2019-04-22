@@ -39,10 +39,12 @@ describe('Controller module', function () {
       assert.strictEqual(await User.getUserByToken(token, deviceIdentifier), null);
     });
     it('Drop user', async function () {
-      assert.ok(await User.dropUser({username}));
+      const user = await User.getUser({username});
+      assert.ok(await user.destroy());
     });
     after(async function () {
-      await User.dropUser({username});
+      const user = await User.getUser({username});
+      user && await user.destroy();
     });
   });
 });
