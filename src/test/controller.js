@@ -38,10 +38,6 @@ describe('Controller module', function () {
       await User.logout(token, deviceIdentifier);
       assert.strictEqual(await User.getUserByToken(token, deviceIdentifier), null);
     });
-    it('Drop user', async function () {
-      const user = await User.getUser({username});
-      assert.ok(await user.destroy());
-    });
     after(async function () {
       const user = await User.getUser({username});
       user && await user.destroy();
