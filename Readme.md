@@ -16,25 +16,25 @@ jsonReply = {
 ```
 ```js
 // When error !== null
-error = {
+data = {
   message: String,
   trace: String,
 }
 ```
 ### status code:
-| status code | description                  |
-| ----------- | ---------------------------- |
-| 0           | Ok                           |
-| 1           | Necessary parameter required |
-| 2           | Login required               |
-| -1          | Unknown server error         |
+| status code | description                   |
+| ----------- | ----------------------------- |
+| 0           | Ok                            |
+| 1           | Necessary parameter required  |
+| 2           | Login required                |
+| 3           | Unique constraint is violated |
+| -1          | Unknown server error          |
 
 ## /api/user/
 ### status code:
-| status code | description                                       |
-| ----------- | ------------------------------------------------- |
-| 100         | Authentication Failed, wrong username or password |
-| 101         | Username has been existed                         |
+| status code | description           |
+| ----------- | --------------------- |
+| 100         | Authentication Failed |
 
 - POST /api/user/login
   ```js

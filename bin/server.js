@@ -14,7 +14,7 @@ app.use(async (context, next) => {
   try {
     await next();
   } catch (e) {
-    reply(context, null, e, -1);
+    reply(context, null, e);
     console.error(e.stack);
   }
 });

@@ -1,8 +1,6 @@
 const fs = require('fs'), path = require('path'), crypto = require('crypto');
 const {promisify} = require('util');
 
-const config = require('../config');
-
 String.prototype.mix = function (str) {
   const [shorter, longer] = [this, str.toString()].sort((a, b) => a.length - b.length);
   return Array.from(longer).reduce((previousValue, currentValue, currentIndex) => {
@@ -59,32 +57,50 @@ const redisClient = {
   expire: promisify(client.expire).bind(client),
 };
 
-function reply(ctx, data, error = null, status = 0) {
-  ctx.body = {
-    status, error: error ? error.toString() : null, data: error ? {
-      message: error.message,
-      trace: error.stack,
-    } : data,
-  };
-}
+const {ErrorWithStatus, reply} = (function () {
+  const statusDescMap = {
+    [-1]: 'Unknown server error',
+    [1]: 'Necessary parameter required',
+    [2]: 'Login required',
+    [3]: 'Unique constraint is violated',
+    [100]: 'Authentication Failed',
+    [101]: 'Username has existed',
+  }, statusKey = Symbol('status');
 
-// function customPromisify(func) {
-//   if (typeof func !== "function") {
-//     throw new TypeError("expecting a function but got " + typeof func);
-//   }
-//   return function (...args) {
-//     return new Promise((resolve, reject) => {
-//       func.call(this, ...args, (err, result) => {
-//         if (err) reject(err);
-//         else resolve(result);
-//       });
-//     });
-//   };
-// }
+  function reply(ctx, data = null, error = null) {
+    const status = error && error.getErrorStatus() || 0;
+    ctx.body = {
+      status, error: error ? error.toString() : null,
+      data: error ? {
+        message: statusDescMap[status] + error.message ? `: ${error.message}` : '',
+        trace: error.stack,
+      } : data,
+    };
+  }
+
+  function ErrorWithStatus(message = '', status = -1) {
+    if (!new.target) return new ErrorWithStatus(message, status);
+    Error.constructor.call(this, message);
+    this[statusKey] = status;
+  }
+
+  Error.prototype.getErrorStatus = () => -1;
+  ErrorWithStatus.prototype = Object.assign(
+    Object.create(Error.prototype),
+    {
+      constructor: ErrorWithStatus,
+      getErrorStatus() {
+        return this[statusKey];
+      },
+    },
+  );
+  return {ErrorWithStatus, reply};
+})();
 
 module.exports = {
   autoImport,
   redisClient,
   secretHash,
   reply,
+  ErrorWithStatus,
 };
