@@ -23,7 +23,7 @@ app.use(convert(Cors({
 })));
 app.keys = config.sessionKeys;
 app.use(BodyParser());
-app.use(Static(config.staticOpt.dir || './public', config.staticOpt));
+app.use(Static(config.staticOpt.dir || '../public', config.staticOpt));
 app.use(router.routes()).use(router.allowedMethods());
 
 app.listen(config.port);

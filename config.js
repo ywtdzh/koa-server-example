@@ -22,7 +22,7 @@ const config = {
     }), // String or Function(identifier) -> Promise[String]
   },
   staticOpt: {
-    dir: './public',
+    dir: '../public',
     maxage: 60000 * 60 * 24,
   },
 };
