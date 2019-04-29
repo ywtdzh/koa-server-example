@@ -97,10 +97,21 @@ const {ErrorWithStatus, reply} = (function () {
   return {ErrorWithStatus, reply};
 })();
 
+async function requireLogin(ctx, controllers) {
+  const {token, identifier} = ctx.request.header;
+  if (token) {
+    const {user: User} = controllers;
+    const user = await User.getUserByToken(token, identifier);
+    if (user) return user;
+  }
+  throw new ErrorWithStatus('', 2);
+}
+
 module.exports = {
   autoImport,
   redisClient,
   secretHash,
   reply,
   ErrorWithStatus,
+  requireLogin,
 };

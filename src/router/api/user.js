@@ -1,6 +1,5 @@
-const pendingControllers = require('../../controller');
-const {reply, ErrorWithStatus} = require('../../utils');
-module.exports = function route(router) {
+const {reply, ErrorWithStatus, requireLogin} = require('../../utils');
+module.exports = function route(router, controllers) {
   function get(api, middleware) {
     router.get.call(router, `/api/user/${api}`.replace(/\/+/g, '/'), middleware);
   }
@@ -12,7 +11,7 @@ module.exports = function route(router) {
   post('login', async ctx => {
     const {username, password, identifier} = ctx.request.body;
     if (!username || !password) throw ErrorWithStatus('username & password', 1);
-    const {user: User} = await pendingControllers;
+    const {user: User} = controllers;
     const token = await User.login(username, password, identifier || '0');
     if (!token) throw ErrorWithStatus('', 100);
     else reply(ctx, {token});
@@ -21,7 +20,7 @@ module.exports = function route(router) {
   post('logout', async ctx => {
     const {token, identifier} = ctx.request.header;
     if (token) {
-      const {user: User} = await pendingControllers;
+      const {user: User} = controllers;
       await User.logout(token, identifier);
     }
     reply(ctx);
@@ -30,7 +29,7 @@ module.exports = function route(router) {
   post('register', async ctx => {
     const {username, password, identifier, description} = ctx.request.body;
     if (!username || !password) throw new ErrorWithStatus('username & password', 1);
-    const {user: User} = await pendingControllers;
+    const {user: User} = controllers;
     const user = await User.createUser({username, password, description});
     if (user === null) throw new ErrorWithStatus('username', 3);
     const token = await User.login(username, password, identifier);
@@ -40,7 +39,7 @@ module.exports = function route(router) {
 
   post('change_password', async ctx => {
     const {username, previous, expected} = ctx.request.body;
-    const {user: User} = await pendingControllers;
+    const {user: User} = controllers;
     const user = await User.getUser({username});
     if (!user) throw new ErrorWithStatus('', 100);
     if (user.password === await User.hashPassword(username, previous)) {
@@ -53,12 +52,7 @@ module.exports = function route(router) {
   });
 
   get('hello', async ctx => {
-    const {token, identifier} = ctx.request.header;
-    if (token) {
-      const {user: User} = await pendingControllers;
-      const theUser = await User.getUserByToken(token, identifier || '0');
-      if (theUser) return reply(ctx, {message: 'success'});
-    }
-    throw new ErrorWithStatus('', 2);
+    await requireLogin(ctx, controllers);
+    reply(ctx, {message: 'success'});
   });
 };
