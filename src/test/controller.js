@@ -7,7 +7,7 @@ describe('Controller module', function () {
     controllers = await pendingControllers;
   });
   it('User controller exists', async function () {
-    assert.ok(controllers.user);
+    assert.ok(controllers.User);
   });
   describe('User', function () {
     let token, User;
@@ -17,7 +17,7 @@ describe('Controller module', function () {
       description = Math.random().toString(36).substr(2),
       deviceIdentifier = Math.random().toString(36).substr(2);
     before(async function () {
-      User = controllers.user;
+      User = controllers.User;
     });
     it('Create user', async function () {
       const theUser = await User.createUser({username, password, description});

@@ -55,7 +55,7 @@ async function getUser({username = null, id = null}) {
 }
 
 module.exports = {
-  name: 'user',
+  name: 'User',
   getUserByToken,
   createUser,
   validateUser,

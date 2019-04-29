@@ -11,7 +11,7 @@ module.exports = function route(router, controllers) {
   post('login', async ctx => {
     const {username, password, identifier} = ctx.request.body;
     if (!username || !password) throw ErrorWithStatus('username & password', 1);
-    const {user: User} = controllers;
+    const {User} = controllers;
     const token = await User.login(username, password, identifier || '0');
     if (!token) throw ErrorWithStatus('', 100);
     else reply(ctx, {token});
@@ -20,7 +20,7 @@ module.exports = function route(router, controllers) {
   post('logout', async ctx => {
     const {token, identifier} = ctx.request.header;
     if (token) {
-      const {user: User} = controllers;
+      const {User} = controllers;
       await User.logout(token, identifier);
     }
     reply(ctx);
@@ -29,7 +29,7 @@ module.exports = function route(router, controllers) {
   post('register', async ctx => {
     const {username, password, identifier, description} = ctx.request.body;
     if (!username || !password) throw new ErrorWithStatus('username & password', 1);
-    const {user: User} = controllers;
+    const {User} = controllers;
     const user = await User.createUser({username, password, description});
     if (user === null) throw new ErrorWithStatus('username', 3);
     const token = await User.login(username, password, identifier);
@@ -39,7 +39,7 @@ module.exports = function route(router, controllers) {
 
   post('change_password', async ctx => {
     const {username, previous, expected} = ctx.request.body;
-    const {user: User} = controllers;
+    const {User} = controllers;
     const user = await User.getUser({username});
     if (!user) throw new ErrorWithStatus('', 100);
     if (user.password === await User.hashPassword(username, previous)) {

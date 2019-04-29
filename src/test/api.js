@@ -55,7 +55,7 @@ describe('Api test', function () {
     });
   });
   after(async function () {
-    const {user: User} = await pendingControllers;
+    const {User} = await pendingControllers;
     const instances = await Promise.all([
       User.getUser({id: userId}),
     ]);

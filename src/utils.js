@@ -100,7 +100,7 @@ const {ErrorWithStatus, reply} = (function () {
 async function requireLogin(ctx, controllers) {
   const {token, identifier} = ctx.request.header;
   if (token) {
-    const {user: User} = controllers;
+    const {User} = controllers;
     const user = await User.getUserByToken(token, identifier);
     if (user) return user;
   }
