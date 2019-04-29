@@ -6,7 +6,7 @@ const uniqueUUID = require('uuid/v1');
 const randomUUID = require('uuid/v4');
 
 async function getUserByToken(token, identifier) {
-  const {user: User} = await pendingModels;
+  const {User} = await pendingModels;
   const id = parseInt(await redisClient.hashGet(token, identifier));
   if (Number.isNaN(id)) return null;
   return await User.findByPk(id);
@@ -20,7 +20,7 @@ async function hashPassword(username, password) {
 }
 
 async function createUser(options = {username: '', password: '', description: ''}) {
-  const {user: User} = await pendingModels;
+  const {User} = await pendingModels;
   const encrypted = await hashPassword(options.username, options.password);
   const [theUser, created] = await User.findOrCreate({
     where: {username: options.username},
@@ -30,7 +30,7 @@ async function createUser(options = {username: '', password: '', description: ''
 }
 
 async function validateUser(username, password) {
-  const {user: User} = await pendingModels;
+  const {User} = await pendingModels;
   const theUser = await User.findOne({where: {username}});
   if (!theUser) return {status: false};
   return {status: await hashPassword(username, password) === theUser.getDataValue('password'), theUser};
@@ -50,7 +50,7 @@ async function logout(token, deviceIdentifier) {
 }
 
 async function getUser({username = null, id = null}) {
-  const {user: User} = await pendingModels;
+  const {User} = await pendingModels;
   return await User.findOne({where: {[Op.or]: [{username}, {id}]}});
 }
 

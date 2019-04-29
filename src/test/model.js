@@ -7,6 +7,6 @@ describe('Database module', function () {
     models = await pendingModels;
   });
   it('Model User exists', async function () {
-    assert.ok(models.user);
+    assert.ok(models.User);
   });
 });
