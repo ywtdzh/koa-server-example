@@ -63,12 +63,14 @@ const {ErrorWithStatus, reply} = (function () {
     [1]: 'Necessary parameter required',
     [2]: 'Login required',
     [3]: 'Unique constraint is violated',
+    [4]: 'Specified object doesn\'t exist',
     [100]: 'Authentication Failed',
     [101]: 'Username has existed',
   }, statusKey = Symbol('status');
 
   function reply(ctx, data = null, error = null) {
     const status = error && error.getErrorStatus() || 0;
+    if (status === -1) console.error(error.stack);
     ctx.body = {
       status, error: error ? error.toString() : null,
       data: error ? {
@@ -78,14 +80,7 @@ const {ErrorWithStatus, reply} = (function () {
     };
   }
 
-  function ErrorWithStatus(message = '', status = -1) {
-    if (!new.target) return new ErrorWithStatus(message, status);
-    Error.constructor.call(this, message);
-    this[statusKey] = status;
-  }
-
-  Error.prototype.getErrorStatus = () => -1;
-  ErrorWithStatus.prototype = Object.assign(
+  const prototype = Object.assign(
     Object.create(Error.prototype),
     {
       constructor: ErrorWithStatus,
@@ -94,6 +89,18 @@ const {ErrorWithStatus, reply} = (function () {
       },
     },
   );
+
+  function ErrorWithStatus(message = '', status = -1) {
+    const error = new Error(message);
+    error.name = 'ErrorWithStatus';
+    error[statusKey] = status;
+    Error.captureStackTrace(error, ErrorWithStatus);
+    Object.setPrototypeOf(error, prototype);
+    return error;
+  }
+
+  Error.prototype.getErrorStatus = () => -1;
+
   return {ErrorWithStatus, reply};
 })();
 
