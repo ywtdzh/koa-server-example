@@ -22,13 +22,14 @@ data = {
 }
 ```
 ### status code:
-| status code | description                   |
-| ----------- | ----------------------------- |
-| 0           | Ok                            |
-| 1           | Necessary parameter required  |
-| 2           | Login required                |
-| 3           | Unique constraint is violated |
-| -1          | Unknown server error          |
+| status code | description                     |
+| ----------- | ------------------------------- |
+| 0           | Ok                              |
+| 1           | Necessary parameter required    |
+| 2           | Login required                  |
+| 3           | Unique constraint is violated   |
+| 4           | Specified object doesn\'t exist |
+| -1          | Unknown server error            |
 
 ## /api/user/
 ### status code:
